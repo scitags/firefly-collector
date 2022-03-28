@@ -1,0 +1,79 @@
+{
+  "template": {
+    "mappings": {
+      "dynamic": "true",
+      "dynamic_date_formats": [
+        "strict_date_optional_time",
+        "yyyy/MM/dd HH:mm:ss Z||yyyy/MM/dd Z"
+      ],
+      "dynamic_templates": [
+        {
+          "ip_field": {
+            "match": "ip",
+            "mapping": {
+              "type": "ip"
+            }
+          }
+        },
+        {
+          "ipv4_field": {
+            "match": "ipv4",
+            "mapping": {
+              "type": "ip"
+            }
+          }
+        },
+        {
+          "ipv6_field": {
+            "match": "ipv6",
+            "mapping": {
+              "type": "ip"
+            }
+          }
+        },
+        {
+          "ip_suffix_field": {
+            "match": "*_ip",
+            "mapping": {
+              "type": "ip"
+            }
+          }
+        },
+        {
+          "location": {
+            "match": "location",
+            "mapping": {
+              "type": "geo_point"
+            }
+          }
+        },
+        {
+          "location_suffix_field": {
+            "match": "*_location",
+            "mapping": {
+              "type": "geo_point"
+            }
+          }
+        },
+        {
+          "histogram_suffix_field": {
+            "match": "*_hist",
+            "mapping": {
+              "type": "histogram"
+            }
+          }
+        },
+        {
+          "default_string_to_keyword": {
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "keyword"
+            }
+          }
+        }
+      ],
+      "date_detection": true,
+      "numeric_detection": false
+    }
+  }
+}

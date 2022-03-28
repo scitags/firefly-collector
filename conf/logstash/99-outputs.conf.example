@@ -1,0 +1,27 @@
+
+output {
+        elasticsearch {
+                #Modify below with one or more elastic servers in your cluster
+                hosts => [
+                "https://ELASTICSERVER1:9200",
+                "https://ELASTICSERVER2:9200",
+                "https://ELASTICSERVER3:9200"
+                ]
+                #Change credentials to match your server
+                user => "CHANGEME"
+                password => "CHANGEME"
+                ssl => "true"
+                # Add your CA cert into certificates directory
+                cacert => "/etc/stardust/pipeline/certificates/elastic.cer"
+                #This just disables hostname checking, still need CA cert
+                ssl_certificate_verification => false
+                ilm_enabled => "true"
+                ilm_pattern => "{now/d}-000001"
+                ilm_rollover_alias => "stardust_firefly"
+                template => "/etc/stardust/pipeline/elastic_template.json"
+                template_name => "stardust_firefly"
+                template_overwrite => false
+                #Create an ILM policy on your server using this name prior to launching logstash
+                #ilm_policy => "timeseries-firefly"
+        }
+}

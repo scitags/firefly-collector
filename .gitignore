@@ -1,0 +1,4 @@
+**/.DS_Store
+conf/logstash/99-outputs.conf
+conf/logstash_data/certificates/
+conf/certificates/
