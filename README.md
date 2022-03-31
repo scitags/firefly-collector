@@ -1,4 +1,4 @@
-# Scitag firefly collector
+# Firefly Collector
 
 # What is this?
 
