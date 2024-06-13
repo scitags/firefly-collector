@@ -1,0 +1,10 @@
+output {
+  udp {
+    host => "<REPLACE_WFIREFLY_COLLECTOR>"
+    id => "udp_out"
+    port => 10514
+    codec => plain {
+      format => "%{message}"
+    }
+  } 
+}

@@ -1,0 +1,7 @@
+output { stdout { 
+           id => "stdout"
+           codec => rubydebug {
+              metadata => false
+           } 
+         } 
+       }
