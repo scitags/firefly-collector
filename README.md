@@ -14,6 +14,8 @@ To configure the pipeline run `cp conf/logstash/99-outputs.conf.example conf/log
 
 To configure forwarding run `cp conf/logstash/99-firefly-fwd.conf.example conf/logstash/99-firefly-fwd.conf`. Open the copied file and change REPLACE_WFIREFLY_COLLECTOR to the hostname of the collector where fireflies should be forwarded.
 
+Current configuration expects that collector runs on a dual stack machine. If that's not the case please update `conf/logstash/01-input.conf` host field to `0.0.0.0`.
+
 With the Opensearch parameters configured, bring up the pipeline as follows:
 
 ```
