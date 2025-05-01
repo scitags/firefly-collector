@@ -1,0 +1,1 @@
+0 * * * * /usr/src/app/cric_metadata_collector.py > /tmp/cron.log 2>&1

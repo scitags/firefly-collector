@@ -1,0 +1,7 @@
+version: '3.7'
+services:
+  cron:
+    image: metadata/cron:latest
+    build:
+      context: .
+      dockerfile: Dockerfile

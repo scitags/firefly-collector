@@ -1,0 +1,12 @@
+version: "3.7"
+services:
+    metadata_cric:
+        image: metadata/cric:latest
+        restart: always
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - CRIC_META_OUTPUT_MMDB=/data/cache/cric.mmdb
+        volumes:
+            - ../output_files:/data/cache
