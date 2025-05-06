@@ -1,6 +1,6 @@
-PUT _index_template/flow-lifecycle-template
+PUT _index_template/firefly-template
 {
-  "index_patterns": ["flow-lifecycle-*"],
+  "index_patterns": ["firefly-*"],
   "template": {
     "settings": {
       "index": {
@@ -10,82 +10,80 @@ PUT _index_template/flow-lifecycle-template
       }
     },
     "mappings": {
+      "dynamic": "true",
+      "dynamic_date_formats": [
+        "strict_date_optional_time",
+        "yyyy/MM/dd HH:mm:ss Z||yyyy/MM/dd Z"
+      ],
+      "dynamic_templates": [
+        {
+          "ip_field": {
+            "match": "ip",
+            "mapping": {
+              "type": "ip"
+            }
+          }
+        },
+        {
+          "ipv4_field": {
+            "match": "ipv4",
+            "mapping": {
+              "type": "ip"
+            }
+          }
+        },
+        {
+          "ipv6_field": {
+            "match": "ipv6",
+            "mapping": {
+              "type": "ip"
+            }
+          }
+        },
+        {
+          "ip_suffix_field": {
+            "match": "*_ip",
+            "mapping": {
+              "type": "ip"
+            }
+          }
+        },
+        {
+          "location": {
+            "match": "location",
+            "mapping": {
+              "type": "geo_point"
+            }
+          }
+        },
+        {
+          "location_suffix_field": {
+            "match": "*_location",
+            "mapping": {
+              "type": "geo_point"
+            }
+          }
+        },
+        {
+          "histogram_suffix_field": {
+            "match": "*_hist",
+            "mapping": {
+              "type": "histogram"
+            }
+          }
+        },
+        {
+          "default_string_to_keyword": {
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "keyword"
+            }
+          }
+        }
+      ],
+      "date_detection": true,
+      "numeric_detection": false,
       "properties": {
-        "version": {
-          "type": "keyword"
-        },
-        "flow-lifecycle": {
-          "type": "object",
-          "properties": {
-            "state": {
-              "type": "keyword"
-            },
-            "current-time": {
-              "type": "date",
-              "format": "strict_date_optional_time||epoch_millis"
-            },
-            "start-time": {
-              "type": "date",
-              "format": "strict_date_optional_time||epoch_millis"
-            }
-          }
-        },
-        "usage": {
-          "type": "object",
-          "properties": {
-            "received": {
-              "type": "long"
-            },
-            "sent": {
-              "type": "long"
-            }
-          }
-        },
-        "netlink": {
-          "type": "object",
-          "properties": {
-            "rtt": {
-              "type": "float"
-            }
-          }
-        },
-        "context": {
-          "type": "object",
-          "properties": {
-            "experiment-id": {
-              "type": "integer"
-            },
-            "activity-id": {
-              "type": "integer"
-            },
-            "application": {
-              "type": "keyword"
-            }
-          }
-        },
-        "flow-id": {
-          "type": "object",
-          "properties": {
-            "afi": {
-              "type": "keyword"
-            },
-            "src-ip": {
-              "type": "ip"
-            },
-            "dst-ip": {
-              "type": "ip"
-            },
-            "protocol": {
-              "type": "keyword"
-            },
-            "src-port": {
-              "type": "integer"
-            },
-            "dst-port": {
-              "type": "integer"
-            }
-          }
-        },
         "@timestamp": {
           "type": "date",
           "format": "strict_date_optional_time||epoch_millis"
@@ -93,7 +91,6 @@ PUT _index_template/flow-lifecycle-template
       }
     }
   },
-  "data_stream": {}
+  "data_stream": {
+  }
 }
-
-PUT _data_stream/flow-lifecycle-stream
