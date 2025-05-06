@@ -1,0 +1,99 @@
+PUT _index_template/flow-lifecycle-template
+{
+  "index_patterns": ["flow-lifecycle-*"],
+  "template": {
+    "settings": {
+      "index": {
+        "number_of_shards": 1,
+        "number_of_replicas": 1,
+        "routing.allocation.include._tier_preference": "data_tier_hot,data_tier_warm,data_tier_cold"
+      }
+    },
+    "mappings": {
+      "properties": {
+        "version": {
+          "type": "keyword"
+        },
+        "flow-lifecycle": {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "keyword"
+            },
+            "current-time": {
+              "type": "date",
+              "format": "strict_date_optional_time||epoch_millis"
+            },
+            "start-time": {
+              "type": "date",
+              "format": "strict_date_optional_time||epoch_millis"
+            }
+          }
+        },
+        "usage": {
+          "type": "object",
+          "properties": {
+            "received": {
+              "type": "long"
+            },
+            "sent": {
+              "type": "long"
+            }
+          }
+        },
+        "netlink": {
+          "type": "object",
+          "properties": {
+            "rtt": {
+              "type": "float"
+            }
+          }
+        },
+        "context": {
+          "type": "object",
+          "properties": {
+            "experiment-id": {
+              "type": "integer"
+            },
+            "activity-id": {
+              "type": "integer"
+            },
+            "application": {
+              "type": "keyword"
+            }
+          }
+        },
+        "flow-id": {
+          "type": "object",
+          "properties": {
+            "afi": {
+              "type": "keyword"
+            },
+            "src-ip": {
+              "type": "ip"
+            },
+            "dst-ip": {
+              "type": "ip"
+            },
+            "protocol": {
+              "type": "keyword"
+            },
+            "src-port": {
+              "type": "integer"
+            },
+            "dst-port": {
+              "type": "integer"
+            }
+          }
+        },
+        "@timestamp": {
+          "type": "date",
+          "format": "strict_date_optional_time||epoch_millis"
+        }
+      }
+    }
+  },
+  "data_stream": {}
+}
+
+PUT _data_stream/flow-lifecycle-stream
