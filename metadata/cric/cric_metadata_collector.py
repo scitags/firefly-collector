@@ -3,7 +3,7 @@
 ####
 # Name: CRIC metadata Collector
 # Description:
-#   This script generates a MMDB file that collects relevant CRIC metadata 
+#   This script generates a MMDB file that collects relevant CRIC metadata
 #
 # Output Files:
 #   cric.mmdb :
@@ -28,7 +28,7 @@ from json import dumps
 from mmdb_writer import MMDBWriter
 
 
-DEFAULT_CRIC_URL="https://atlas-cric.cern.ch/api/atlas/site/query/?json"
+DEFAULT_CRIC_URL="http://wlcg-cric.cern.ch/api/core/rcsite/query/?json"
 
 class CRICMetadataCollector:
 
@@ -61,54 +61,49 @@ class CRICMetadataCollector:
         except:
             self.log.error("Unhandled exception")
 
-        return result_json        
+        return result_json
 
     def collect(self, args):
         url = DEFAULT_CRIC_URL
         mmdb = MMDBWriter(ip_version=6, ipv4_compatible=True, database_type="GeoLite2-City")
-        
+
         if url:
             result_json = self._get_cric_json(url)
             if result_json:
                 for result in result_json.values():
-                    cric_vals = {"cric":{}}
+                    cric_vals = dict()
                     # this will create 'location' if it doesn't exist so we don't run into keyerror
-                    cric_vals.setdefault("location", {})
-                    
+                    cric_vals.setdefault("location", { "latitude": 0.0, "longitude": 0.0 })
+
                     # add all relevant metadata for the ATLAS-CRIC sites that we care about
                     # add name
                     if result.get("name", None):
                         cric_vals["name"] = result["name"]
-                    # add latitude  
+                    # add latitude
                     if result.get("latitude", None):
-                        cric_vals["location"]["lat"] = result["latitude"]
+                        cric_vals["location"]["latitude"] = result["latitude"]
                     # add longitude
                     if result.get("longitude", None):
-                        cric_vals["location"]["lon"]  = result["longitude"]
+                        cric_vals["location"]["longitude"]  = result["longitude"]
                     # add rc_country
-                    if result.get("rc_country", None):
-                        cric_vals["rc_country"] = result["rc_country"]
-                    # add rc_site
-                    if result.get("rc_site", None):
-                        cric_vals["rc_site"] = result["rc_site"]
+                    if result.get("country", None):
+                        cric_vals["rc_country"] = result["country"]
                     # add rc_tier_level
                     if result.get("rc_tier_level", None):
-                        cric_vals["rc_tier_level"] = result["rc_tier_level"]    
-                    
-                    # get individual site prefixes
-                    ip_prefixes = []
-                    for key, prefix_ids in result.get("networks", {}).items():
-                        for prefix_id in prefix_ids:
-                            ip_prefixes.append(prefix_id)
+                        cric_vals["tier"] = result["rc_tier_level"]
 
-                    #add to map
-                    self.log.debug(cric_vals)
-                    #Logstash only understands city and asn dbs, so fake this data as city name and expand in logstash later
-                    if ip_prefixes:
+                    for netr in result.get("netroutes", {}).values():
+                        cric_vals["net_site"] = netr.get("name", "unknown")
+                        ip_prefixes = []
+                        for key, prefixes in netr.get("networks", {}).items():
+                            for prefix in prefixes:
+                                ip_prefixes.append(prefix)
+                        self.log.debug(cric_vals)
+                        self.log.debug(ip_prefixes)
                         #Record format:
                         # {"city": {"names": { "en": "JSON_TEXT_GOES_HERE"}},"location": {"latitude": 0.0, "longitude": 0.0 }}
                         # We have to have location or it won't work, we can strip it out in logstash as well
-                        mmdb.insert_network(IPSet(ip_prefixes), { "city": { "names":{ "en": dumps(cric_vals) } }, "location": { "latitude": 0.0, "longitude": 0.0 } })
+                        mmdb.insert_network(IPSet(ip_prefixes), { "city": { "names":{ "en": dumps(cric_vals) } }, "location": cric_vals["location"] })
 
         #write to MMDB file
         self._write_mmdb(args, mmdb)
@@ -141,7 +136,7 @@ class CRICMetadataCollector:
             args.verbose = os.environ.get('CRIC_META_VERBOSE', False)
         if not args.periodic:
             args.periodic = int(os.environ.get('CRIC_META_PERIODIC', 0))
-        
+
         #subclass hook to add more checks
         self.check_cmdline_args(args)
 
@@ -151,17 +146,17 @@ class CRICMetadataCollector:
             self.log = logging.getLogger()
         else:
             logging.basicConfig(format="time=%(asctime)s level=%(levelname)s %(message)s")
-            self.log = logging.getLogger() 
+            self.log = logging.getLogger()
             if args.verbose:
                 self.log.setLevel(logging.DEBUG)
             else:
-                self.log.setLevel(logging.INFO)    
+                self.log.setLevel(logging.INFO)
 
     def run(self):
         parser= self.build_arg_parser()
         args = parser.parse_args()
         self.check_args(args)
-        
+
         #Get down to business
         if args.periodic > 0:
             self.log.info("collection={0} msg=Started".format(self.collection))
@@ -174,7 +169,7 @@ class CRICMetadataCollector:
                 self.log.info("collection={0} msg=Sleeping for {1} seconds".format(self.collection, args.periodic))
                 time.sleep(args.periodic)
             else:
-                break    
+                break
 
 #Main function
 if __name__ == "__main__":
