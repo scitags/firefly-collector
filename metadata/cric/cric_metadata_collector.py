@@ -71,9 +71,9 @@ class CRICMetadataCollector:
             result_json = self._get_cric_json(url)
             if result_json:
                 for result in result_json.values():
-                    cric_vals = dict()
+                    cric_vals = {"cric":{}}
                     # this will create 'location' if it doesn't exist so we don't run into keyerror
-                    cric_vals.setdefault("location", { "latitude": 0.0, "longitude": 0.0 })
+                    cric_vals.setdefault("location", { "lat": 0.0, "lon": 0.0 })
 
                     # add all relevant metadata for the ATLAS-CRIC sites that we care about
                     # add name
@@ -81,10 +81,10 @@ class CRICMetadataCollector:
                         cric_vals["name"] = result["name"]
                     # add latitude
                     if result.get("latitude", None):
-                        cric_vals["location"]["latitude"] = result["latitude"]
+                        cric_vals["location"]["lat"] = result["latitude"]
                     # add longitude
                     if result.get("longitude", None):
-                        cric_vals["location"]["longitude"]  = result["longitude"]
+                        cric_vals["location"]["lon"]  = result["longitude"]
                     # add rc_country
                     if result.get("country", None):
                         cric_vals["rc_country"] = result["country"]
@@ -103,7 +103,7 @@ class CRICMetadataCollector:
                         #Record format:
                         # {"city": {"names": { "en": "JSON_TEXT_GOES_HERE"}},"location": {"latitude": 0.0, "longitude": 0.0 }}
                         # We have to have location or it won't work, we can strip it out in logstash as well
-                        mmdb.insert_network(IPSet(ip_prefixes), { "city": { "names":{ "en": dumps(cric_vals) } }, "location": cric_vals["location"] })
+                        mmdb.insert_network(IPSet(ip_prefixes), { "city": { "names":{ "en": dumps(cric_vals) } }, "location": { "latitude": 0.0, "longitude": 0.0 } })
 
         #write to MMDB file
         self._write_mmdb(args, mmdb)
