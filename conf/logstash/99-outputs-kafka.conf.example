@@ -1,0 +1,13 @@
+output {
+    kafka {
+        bootstrap_servers => "message-exchange.es.net:9095"
+        sasl_jaas_config => "org.apache.kafka.common.security.scram.ScramLoginModule required username=${kafka_username}  password=${kafka_pass};"
+        topic_id => "stardust_firefly"
+        client_id => "firefly-collector"
+        ssl_endpoint_identification_algorithm => ""
+        codec => "json"
+        security_protocol => "SASL_SSL"
+        sasl_mechanism => "SCRAM-SHA-512"
+    }
+}
+
