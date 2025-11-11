@@ -1,0 +1,13 @@
+output {
+    opensearch {
+          hosts  => ["http://localhost:9200"]
+          auth_type => {
+              type => 'basic'
+              user => 'admin'
+              password => 'CHANGEME'
+          }
+          index => "firefly2-stream"
+          action => "create"
+   }
+}
+

@@ -1,0 +1,3 @@
+netaddr
+requests
+git+https://github.com/VimT/MaxMind-DB-Writer-python
