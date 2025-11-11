@@ -453,10 +453,10 @@
         "allValue": "*",
         "current": {
           "text": [
-            "CERN-PROD-LHCOPNE"
+            "$__all"
           ],
           "value": [
-            "CERN-PROD-LHCOPNE"
+            "$__all"
           ]
         },
         "includeAll": true,
@@ -465,7 +465,7 @@
         "name": "src_net_site",
         "options": [
           {
-            "selected": true,
+            "selected": false,
             "text": "CERN-PROD-LHCOPNE",
             "value": "CERN-PROD-LHCOPNE"
           },
@@ -646,18 +646,7 @@
           "type": "grafana-opensearch-datasource",
           "uid": "femd7qlw3owzke"
         },
-        "filters": [
-          {
-            "condition": "",
-            "key": "meta.syslog.hostname",
-            "keyLabel": "meta.syslog.hostname",
-            "operator": "=~",
-            "value": ".*.cern.ch",
-            "valueLabels": [
-              ".*.cern.ch"
-            ]
-          }
-        ],
+        "filters": [],
         "label": "filters",
         "name": "Filters",
         "type": "adhoc"
