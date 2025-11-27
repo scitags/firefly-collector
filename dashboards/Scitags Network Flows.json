@@ -1,0 +1,734 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_GRAFANA-OPENSEARCH-DATASOURCE",
+      "label": "grafana-opensearch-datasource",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "grafana-opensearch-datasource",
+      "pluginName": "OpenSearch"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "12.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "grafana-opensearch-datasource",
+      "name": "OpenSearch",
+      "version": "2.26.1"
+    },
+    {
+      "type": "panel",
+      "id": "text",
+      "name": "Text",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Fireflies dashboard ",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 15,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "# Scientific Network Tags\nMenu: [Overview](/d/IkFCB5Hnk/lhc-data-challenge-overview?orgId=2) | [Interfaces](/d/xAueBcH7k/lhc-data-challenge-interface-details?orgId=2) | [Sites](/d/u5qX95N7k/lhc-data-challenge-sites?orgId=2) | [Regionals](/d/b2c3a9c5-42e5-4b92-91eb-1e6f14a57fa8/lhc-data-challenge-regionals?orgId=2) | [Transatlantic](/d/BU9XBhN7z/lhc-data-challenge-transatlantic-links?orgId=2)  | [LHCOPN](/d/Qj9rzoHnz/lhc-data-challenge-lhcopn-circuits?orgId=2) | **Scientific Network Tags**\n\nThis dashboard shows statistics related to flows marked with [Scientific Network Tag (scitags)](https://www.scitags.org/) and sent to the ESnet firefly collector.",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.0.0",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "grafana-opensearch-datasource",
+        "uid": "${DS_GRAFANA-OPENSEARCH-DATASOURCE}"
+      },
+      "description": "Network throughput across all finished network flows.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Count",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 60,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "alice - "
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cms - "
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "id": 16,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "meta.$group_by",
+              "id": "3",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "asc",
+                "orderBy": "_term",
+                "size": "0"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "@timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "$agg_bin"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "grafana-opensearch-datasource",
+            "uid": "${DS_GRAFANA-OPENSEARCH-DATASOURCE}"
+          },
+          "key": "Q-4e1d2236-8d2c-4d9a-a033-960a577c70b4-0",
+          "metrics": [
+            {
+              "field": "throughput",
+              "id": "1",
+              "type": "sum"
+            }
+          ],
+          "query": "meta.state:end AND meta.cric.src.name:${src_site} AND meta.cric.dst.name:${dst_site:lucene} AND meta.experiment:${vo:lucene} AND meta.activity:${activity:lucene} AND meta.cric.src.net_site:${src_net_site:lucene} AND meta.cric.dst.net_site:${dst_net_site:lucene} AND meta.cric.src.rc_country: ${src_country:lucene} AND meta.cric.dst.rc_country:${dst_country}",
+          "refId": "A",
+          "timeField": "@timestamp"
+        }
+      ],
+      "title": "Network Throughput",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-opensearch-datasource",
+        "uid": "${DS_GRAFANA-OPENSEARCH-DATASOURCE}"
+      },
+      "description": "Number of finished network flows. This roughly corresponds to finished network transfers if transfer is done via single stream (for multi-stream transfers this number can be higher)",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Count",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 60,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [
+            {
+              "field": "meta.$group_by",
+              "id": "3",
+              "settings": {
+                "min_doc_count": "1",
+                "order": "asc",
+                "orderBy": "_term",
+                "size": "0"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "@timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "$agg_bin"
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "datasource": {
+            "type": "grafana-opensearch-datasource",
+            "uid": "${DS_GRAFANA-OPENSEARCH-DATASOURCE}"
+          },
+          "key": "Q-4e1d2236-8d2c-4d9a-a033-960a577c70b4-0",
+          "metrics": [
+            {
+              "id": "1",
+              "type": "count"
+            }
+          ],
+          "query": "meta.state:end AND meta.cric.src.name:${src_site} AND meta.cric.dst.name:${dst_site:lucene} AND meta.experiment:${vo:lucene} AND meta.activity:${activity:lucene} AND meta.cric.src.net_site:${src_net_site:lucene} AND meta.cric.dst.net_site:${dst_net_site:lucene} AND meta.cric.src.rc_country: ${src_country:lucene} AND meta.cric.dst.rc_country:${dst_country}",
+          "refId": "A",
+          "timeField": "@timestamp"
+        }
+      ],
+      "title": "Network Flows ",
+      "transparent": true,
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [
+    "scitags"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "1h",
+          "value": "1h"
+        },
+        "includeAll": false,
+        "label": "Bins",
+        "name": "agg_bin",
+        "options": [
+          {
+            "selected": false,
+            "text": "auto",
+            "value": "auto"
+          },
+          {
+            "selected": true,
+            "text": "1h",
+            "value": "1h"
+          },
+          {
+            "selected": false,
+            "text": "1d",
+            "value": "1d"
+          },
+          {
+            "selected": false,
+            "text": "1w",
+            "value": "1w"
+          },
+          {
+            "selected": false,
+            "text": "1M",
+            "value": "1M"
+          }
+        ],
+        "query": "auto,1h,1d,1w,1M",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": [
+            "$__all"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "includeAll": true,
+        "label": "Source Site",
+        "multi": true,
+        "name": "src_site",
+        "options": [
+          {
+            "selected": false,
+            "text": "CERN-PROD",
+            "value": "CERN-PROD"
+          },
+          {
+            "selected": false,
+            "text": "RAL-LCG2",
+            "value": "RAL-LCG2"
+          }
+        ],
+        "query": "CERN-PROD, RAL-LCG2",
+        "type": "custom"
+      },
+      {
+        "allValue": "*",
+        "current": {
+          "text": [
+            "$__all"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "includeAll": true,
+        "label": "Source Net Site",
+        "multi": true,
+        "name": "src_net_site",
+        "options": [
+          {
+            "selected": false,
+            "text": "CERN-PROD-LHCOPNE",
+            "value": "CERN-PROD-LHCOPNE"
+          },
+          {
+            "selected": false,
+            "text": "RAL-LCG2-LHCOPN",
+            "value": "RAL-LCG2-LHCOPN"
+          }
+        ],
+        "query": "CERN-PROD-LHCOPNE, RAL-LCG2-LHCOPN",
+        "type": "custom"
+      },
+      {
+        "allValue": "*",
+        "current": {},
+        "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.name\"}",
+        "includeAll": true,
+        "label": "Dest Site",
+        "multi": true,
+        "name": "dst_site",
+        "options": [],
+        "query": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.name\"}",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "*",
+        "current": {},
+        "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.rc_country\"}",
+        "includeAll": true,
+        "label": "Dest Country",
+        "multi": true,
+        "name": "dst_country",
+        "options": [],
+        "query": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.rc_country\"}",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "*",
+        "current": {},
+        "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.src.rc_country\"}",
+        "includeAll": true,
+        "label": "Source Country",
+        "multi": true,
+        "name": "src_country",
+        "options": [],
+        "query": "{\"find\": \"terms\", \"field\":\"meta.cric.src.rc_country\"}",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "*",
+        "current": {},
+        "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.src.tier\"}",
+        "includeAll": true,
+        "label": "Source Tier",
+        "multi": true,
+        "name": "src_tier",
+        "options": [],
+        "query": "{\"find\": \"terms\", \"field\":\"meta.cric.src.tier\"}",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "*",
+        "current": {},
+        "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.tier\"}",
+        "includeAll": true,
+        "label": "Dest Tier",
+        "multi": true,
+        "name": "dst_tier",
+        "options": [],
+        "query": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.tier\"}",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "*",
+        "current": {},
+        "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.net_site\"}",
+        "includeAll": true,
+        "label": "Dest Net Site",
+        "name": "dst_net_site",
+        "options": [],
+        "query": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.net_site\"}",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "*",
+        "current": {},
+        "datasource": {
+          "type": "grafana-opensearch-datasource",
+          "uid": "${DS_GRAFANA-OPENSEARCH-DATASOURCE}"
+        },
+        "definition": "{\"find\": \"terms\", \"field\":\"meta.experiment\"}",
+        "includeAll": true,
+        "label": "VO",
+        "multi": true,
+        "name": "vo",
+        "options": [],
+        "query": "{\"find\": \"terms\", \"field\":\"meta.experiment\"}",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allValue": "*",
+        "current": {},
+        "datasource": {
+          "type": "grafana-opensearch-datasource",
+          "uid": "${DS_GRAFANA-OPENSEARCH-DATASOURCE}"
+        },
+        "definition": "{\"find\": \"terms\", \"field\":\"meta.activity\", \"query\": \"meta.experiment:$experiment\"}",
+        "includeAll": true,
+        "label": "Activity",
+        "multi": true,
+        "name": "activity",
+        "options": [],
+        "query": "{\"find\": \"terms\", \"field\":\"meta.activity\", \"query\": \"meta.experiment:$experiment\"}",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allValue": "*",
+        "current": {},
+        "datasource": {
+          "type": "grafana-opensearch-datasource",
+          "uid": "${DS_GRAFANA-OPENSEARCH-DATASOURCE}"
+        },
+        "definition": "{\"find\": \"terms\", \"field\":\"meta.application\"}",
+        "includeAll": true,
+        "label": "Application",
+        "multi": true,
+        "name": "app",
+        "options": [],
+        "query": "{\"find\": \"terms\", \"field\":\"meta.application\"}",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allValue": "*",
+        "current": {},
+        "datasource": {
+          "type": "grafana-opensearch-datasource",
+          "uid": "${DS_GRAFANA-OPENSEARCH-DATASOURCE}"
+        },
+        "definition": "{\"find\": \"terms\", \"field\":\"meta.ip_version\"}",
+        "includeAll": true,
+        "label": "IP Version",
+        "multi": true,
+        "name": "ip",
+        "options": [],
+        "query": "{\"find\": \"terms\", \"field\":\"meta.ip_version\"}",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "baseFilters": [],
+        "datasource": {
+          "type": "grafana-opensearch-datasource",
+          "uid": "femd7qlw3owzke"
+        },
+        "filters": [],
+        "label": "filters",
+        "name": "Filters",
+        "type": "adhoc"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": "experiment",
+          "value": "experiment"
+        },
+        "label": "Group By",
+        "name": "group_by",
+        "options": [
+          {
+            "selected": true,
+            "text": "experiment",
+            "value": "experiment"
+          },
+          {
+            "selected": false,
+            "text": "activity",
+            "value": "activity"
+          },
+          {
+            "selected": false,
+            "text": "application",
+            "value": "application"
+          },
+          {
+            "selected": false,
+            "text": "ip_version",
+            "value": "ip_version"
+          },
+          {
+            "selected": false,
+            "text": "cric.src.name",
+            "value": "cric.src.name"
+          },
+          {
+            "selected": false,
+            "text": "cric.dst.name",
+            "value": "cric.dst.name"
+          },
+          {
+            "selected": false,
+            "text": "cric.src.net_site",
+            "value": "cric.src.net_site"
+          },
+          {
+            "selected": false,
+            "text": "cric.dst.net_site",
+            "value": "cric.dst.net_site"
+          },
+          {
+            "selected": false,
+            "text": "cric.src.rc_countrycric.dst.rc_country",
+            "value": "cric.src.rc_countrycric.dst.rc_country"
+          },
+          {
+            "selected": false,
+            "text": "src_ip",
+            "value": "src_ip"
+          },
+          {
+            "selected": false,
+            "text": "dst_ip",
+            "value": "dst_ip"
+          }
+        ],
+        "query": "experiment,activity,application,ip_version,cric.src.name,cric.dst.name,cric.src.net_site,cric.dst.net_site,cric.src.rc_countrycric.dst.rc_country,src_ip,dst_ip",
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "utc",
+  "title": "Scitags Network Flows",
+  "uid": "a6d7dc1e-dc56-4f39-abe0-a9e7199021e9",
+  "version": 10,
+  "weekStart": ""
+}
