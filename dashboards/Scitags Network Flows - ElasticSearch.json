@@ -86,7 +86,7 @@
         "type": "elasticsearch",
         "uid": "${DS_ESNET}"
       },
-      "description": "Network throughput across all finished network flows.",
+      "description": "Average network throughput across all finished network flows (non-aggregated).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -231,10 +231,7 @@
             {
               "field": "throughput",
               "id": "1",
-              "settings": {
-                "script": "_value/${agg_bin:text}"
-              },
-              "type": "sum"
+              "type": "avg"
             }
           ],
           "query": "meta.state.keyword:end AND meta.cric.src.name.keyword:${src_site} AND meta.cric.dst.name.keyword:${dst_site:lucene} AND meta.cric.src.net_site.keyword:${src_net_site:lucene} AND meta.cric.dst.net_site.keyword:${dst_net_site:lucene} AND meta.experiment_name.keyword:${vo:lucene} AND meta.activity_name.keyword:${activity:lucene} AND meta.cric.src.country.keyword: ${src_country:lucene} AND meta.cric.dst.country.keyword:${dst_country:lucene} AND meta.syslog.hostname.keyword:/.*${origin}/",
@@ -387,7 +384,7 @@
       {
         "current": {
           "selected": true,
-          "text": "3600",
+          "text": "1h",
           "value": "1h"
         },
         "description": "Aggregation window in seconds (3600: 1h, 86400: 1d, 604800: 1w, 262800: 1M)",
@@ -399,31 +396,31 @@
         "options": [
           {
             "selected": false,
-            "text": "1",
+            "text": "auto",
             "value": "auto"
           },
           {
             "selected": true,
-            "text": "3600",
+            "text": "1h",
             "value": "1h"
           },
           {
             "selected": false,
-            "text": "86400",
+            "text": "1d",
             "value": "1d"
           },
           {
             "selected": false,
-            "text": "604800",
+            "text": "1w",
             "value": "1w"
           },
           {
             "selected": false,
-            "text": "2628000",
+            "text": "1M",
             "value": "1M"
           }
         ],
-        "query": "1 : auto,3600 : 1h,86400 : 1d,604800 : 1w, 2628000 : 1M",
+        "query": "auto,1h,1d,1w,1M",
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
@@ -797,8 +794,8 @@
   },
   "timepicker": {},
   "timezone": "utc",
-  "title": "Scitags Network Flows (new)",
-  "uid": "a6d7dc1e-dc56-4f39-abe0-a9e7199021e9",
-  "version": 18,
+  "title": "Scitags Network Flows (v2)",
+  "uid": "a6d7dc1e-dc56-4f39-abe0-a9e7199021f9",
+  "version": 3,
   "weekStart": ""
 }
