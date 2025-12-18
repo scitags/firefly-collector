@@ -5,10 +5,12 @@ def filter(event)
     received = event.get('[usage][received]')
     sent = event.get('[usage][sent]')
 
-    if duration > 0 then
+    if duration > 3 then
       usage_bytes = [received, sent].max
+      total_bytes = [received, sent].sum
       average_throughput = usage_bytes / duration
       event.set('[flow-lifecycle][throughput]', average_throughput)
+      event.set('[flow-lifecycle][total_bytes]', total_bytes)
       return [event]
     else
       return [event]
