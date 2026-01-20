@@ -21,7 +21,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "10.0.3"
+      "version": "12.2.0"
     },
     {
       "type": "panel",
@@ -56,9 +56,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": null,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
       "gridPos": {
@@ -77,7 +75,7 @@
         "content": "# Scientific Network Tags\nMenu: [Overview](/d/IkFCB5Hnk/lhc-data-challenge-overview?orgId=2) | [Interfaces](/d/xAueBcH7k/lhc-data-challenge-interface-details?orgId=2) | [Sites](/d/u5qX95N7k/lhc-data-challenge-sites?orgId=2) | [Regionals](/d/b2c3a9c5-42e5-4b92-91eb-1e6f14a57fa8/lhc-data-challenge-regionals?orgId=2) | [Transatlantic](/d/BU9XBhN7z/lhc-data-challenge-transatlantic-links?orgId=2)  | [LHCOPN](/d/Qj9rzoHnz/lhc-data-challenge-lhcopn-circuits?orgId=2) | **Scientific Network Tags**\n\nThis dashboard shows statistics related to flows marked with [Scientific Network Tag (scitags)](https://www.scitags.org/) and sent to the ESnet firefly collector.",
         "mode": "markdown"
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "12.2.2",
       "transparent": true,
       "type": "text"
     },
@@ -93,11 +91,13 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "Count",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "bars",
             "fillOpacity": 60,
             "gradientMode": "none",
@@ -106,6 +106,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -113,6 +114,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -128,7 +130,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -178,6 +180,7 @@
         "y": 4
       },
       "id": 16,
+      "interval": "$agg_bin",
       "options": {
         "legend": {
           "calcs": [
@@ -197,7 +200,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.0",
+      "pluginVersion": "12.2.2",
       "targets": [
         {
           "alias": "",
@@ -214,7 +217,7 @@
               "type": "terms"
             },
             {
-              "field": "@timestamp",
+              "field": "end",
               "id": "2",
               "settings": {
                 "interval": "$agg_bin"
@@ -229,9 +232,13 @@
           "key": "Q-4e1d2236-8d2c-4d9a-a033-960a577c70b4-0",
           "metrics": [
             {
-              "field": "throughput",
+              "field": "total_bytes",
               "id": "1",
-              "type": "avg"
+              "settings": {
+                "missing": "0",
+                "script": "_value * 1000 / $__interval_ms"
+              },
+              "type": "sum"
             }
           ],
           "query": "meta.state.keyword:end AND meta.cric.src.name.keyword:${src_site} AND meta.cric.dst.name.keyword:${dst_site:lucene} AND meta.cric.src.net_site.keyword:${src_net_site:lucene} AND meta.cric.dst.net_site.keyword:${dst_net_site:lucene} AND meta.experiment_name.keyword:${vo:lucene} AND meta.activity_name.keyword:${activity:lucene} AND meta.cric.src.country.keyword: ${src_country:lucene} AND meta.cric.dst.country.keyword:${dst_country:lucene} AND meta.syslog.hostname.keyword:/.*${origin}/",
@@ -255,11 +262,13 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "Count",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "bars",
             "fillOpacity": 60,
             "gradientMode": "none",
@@ -268,6 +277,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -275,6 +285,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -290,7 +301,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -327,7 +338,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.0",
+      "pluginVersion": "12.2.2",
       "targets": [
         {
           "alias": "",
@@ -374,38 +385,30 @@
     }
   ],
   "refresh": "",
-  "schemaVersion": 38,
-  "style": "dark",
+  "schemaVersion": 42,
   "tags": [
     "scitags"
   ],
   "templating": {
     "list": [
       {
+        "auto": false,
+        "auto_count": 30,
+        "auto_min": "1h",
         "current": {
-          "selected": true,
-          "text": "1h",
-          "value": "1h"
+          "text": "1d",
+          "value": "1d"
         },
-        "description": "Aggregation window in seconds (3600: 1h, 86400: 1d, 604800: 1w, 262800: 1M)",
-        "hide": 0,
-        "includeAll": false,
         "label": "Bins",
-        "multi": false,
         "name": "agg_bin",
         "options": [
           {
             "selected": false,
-            "text": "auto",
-            "value": "auto"
-          },
-          {
-            "selected": true,
             "text": "1h",
             "value": "1h"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "1d",
             "value": "1d"
           },
@@ -420,10 +423,9 @@
             "value": "1M"
           }
         ],
-        "query": "auto,1h,1d,1w,1M",
-        "queryValue": "",
-        "skipUrlSync": false,
-        "type": "custom"
+        "query": "1h,1d,1w,1M",
+        "refresh": 2,
+        "type": "interval"
       },
       {
         "allValue": "*",
@@ -433,7 +435,6 @@
           "uid": "${DS_ESNET}"
         },
         "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.src.name.keyword\"}",
-        "hide": 0,
         "includeAll": true,
         "label": "Source Site",
         "multi": true,
@@ -442,8 +443,6 @@
         "query": "{\"find\": \"terms\", \"field\":\"meta.cric.src.name.keyword\"}",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       },
       {
@@ -454,7 +453,6 @@
           "uid": "${DS_ESNET}"
         },
         "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.name.keyword\"}",
-        "hide": 0,
         "includeAll": true,
         "label": "Dest Site",
         "multi": true,
@@ -463,7 +461,6 @@
         "query": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.name.keyword\"}",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -475,17 +472,13 @@
           "uid": "${DS_ESNET}"
         },
         "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.src.net_site.keyword\"}",
-        "hide": 0,
         "includeAll": true,
         "label": "Source Net Site",
-        "multi": false,
         "name": "src_net_site",
         "options": [],
         "query": "{\"find\": \"terms\", \"field\":\"meta.cric.src.net_site.keyword\"}",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       },
       {
@@ -496,16 +489,13 @@
           "uid": "${DS_ESNET}"
         },
         "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.net_site.keyword\"}",
-        "hide": 0,
         "includeAll": true,
         "label": "Dest Net Site",
-        "multi": false,
         "name": "dst_net_site",
         "options": [],
         "query": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.net_site.keyword\"}",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -516,17 +506,15 @@
           "type": "elasticsearch",
           "uid": "${DS_ESNET}"
         },
-        "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.src.rc_country.keyword\"}",
-        "hide": 0,
+        "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.src.country.keyword\"}",
         "includeAll": true,
         "label": "Source Country",
         "multi": true,
         "name": "src_country",
         "options": [],
-        "query": "{\"find\": \"terms\", \"field\":\"meta.cric.src.rc_country.keyword\"}",
+        "query": "{\"find\": \"terms\", \"field\":\"meta.cric.src.country.keyword\"}",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -537,17 +525,15 @@
           "type": "elasticsearch",
           "uid": "${DS_ESNET}"
         },
-        "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.rc_country.keyword\"}",
-        "hide": 0,
+        "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.country.keyword\"}",
         "includeAll": true,
         "label": "Dest Country",
         "multi": true,
         "name": "dst_country",
         "options": [],
-        "query": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.rc_country.keyword\"}",
+        "query": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.country.keyword\"}",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -560,7 +546,6 @@
         },
         "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.src.rc_tier_level\"}",
         "description": "",
-        "hide": 0,
         "includeAll": true,
         "label": "Source Tier",
         "multi": true,
@@ -569,7 +554,6 @@
         "query": "{\"find\": \"terms\", \"field\":\"meta.cric.src.rc_tier_level\"}",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -581,7 +565,6 @@
           "uid": "${DS_ESNET}"
         },
         "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.rc_tier_level\"}",
-        "hide": 0,
         "includeAll": true,
         "label": "Dest Tier",
         "multi": true,
@@ -590,7 +573,6 @@
         "query": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.rc_tier_level\"}",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -602,7 +584,6 @@
           "uid": "${DS_ESNET}"
         },
         "definition": "{\"find\": \"terms\", \"field\":\"meta.experiment_name.keyword\"}",
-        "hide": 0,
         "includeAll": true,
         "label": "VO",
         "multi": true,
@@ -611,8 +592,6 @@
         "query": "{\"find\": \"terms\", \"field\":\"meta.experiment_name.keyword\"}",
         "refresh": 2,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       },
       {
@@ -623,7 +602,6 @@
           "uid": "${DS_ESNET}"
         },
         "definition": "{\"find\": \"terms\", \"field\":\"meta.activity_name.keyword\", \"query\": \"meta.experiment_name.keyword: $vo\"}",
-        "hide": 0,
         "includeAll": true,
         "label": "Activity",
         "multi": true,
@@ -632,8 +610,6 @@
         "query": "{\"find\": \"terms\", \"field\":\"meta.activity_name.keyword\", \"query\": \"meta.experiment_name.keyword: $vo\"}",
         "refresh": 2,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       },
       {
@@ -644,7 +620,6 @@
           "uid": "${DS_ESNET}"
         },
         "definition": "{\"find\": \"terms\", \"field\":\"meta.application.keyword\"}",
-        "hide": 0,
         "includeAll": true,
         "label": "Application",
         "multi": true,
@@ -653,8 +628,6 @@
         "query": "{\"find\": \"terms\", \"field\":\"meta.application.keyword\"}",
         "refresh": 2,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       },
       {
@@ -665,7 +638,6 @@
           "uid": "${DS_ESNET}"
         },
         "definition": "{\"find\": \"terms\", \"field\":\"meta.ip_version\"}",
-        "hide": 0,
         "includeAll": true,
         "label": "IP Version",
         "multi": true,
@@ -674,21 +646,17 @@
         "query": "{\"find\": \"terms\", \"field\":\"meta.ip_version\"}",
         "refresh": 2,
         "regex": "",
-        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
       {
         "allowCustomValue": false,
         "current": {
-          "selected": true,
           "text": "experiment_name.keyword",
           "value": "experiment_name.keyword"
         },
-        "hide": 0,
         "includeAll": false,
         "label": "Group By",
-        "multi": false,
         "name": "group_by",
         "options": [
           {
@@ -723,13 +691,13 @@
           },
           {
             "selected": false,
-            "text": "cric.src.rc_country.keyword",
-            "value": "cric.src.rc_country.keyword"
+            "text": "cric.src.country.keyword",
+            "value": "cric.src.country.keyword"
           },
           {
             "selected": false,
-            "text": "cric.dst.rc_country.keyword",
-            "value": "cric.dst.rc_country.keyword"
+            "text": "cric.dst.country.keyword",
+            "value": "cric.dst.country.keyword"
           },
           {
             "selected": false,
@@ -747,19 +715,15 @@
             "value": "syslog.hostname.keyword"
           }
         ],
-        "query": "experiment_name.keyword,activity_name.keyword,application,ip_version,cric.src.name.keyword,cric.dst.name.keyword,cric.src.rc_country.keyword,cric.dst.rc_country.keyword,src_ip,dst_ip,syslog.hostname.keyword",
-        "queryValue": "",
-        "skipUrlSync": false,
+        "query": "experiment_name.keyword,activity_name.keyword,application,ip_version,cric.src.name.keyword,cric.dst.name.keyword,cric.src.country.keyword,cric.dst.country.keyword,src_ip,dst_ip,syslog.hostname.keyword",
         "type": "custom"
       },
       {
         "current": {
-          "selected": false,
           "text": "",
           "value": ""
         },
         "description": "Show results only from the specific list of storages (regex, starts with .*)",
-        "hide": 0,
         "label": "Origin Regexp",
         "name": "origin",
         "options": [
@@ -770,32 +734,30 @@
           }
         ],
         "query": "",
-        "skipUrlSync": false,
         "type": "textbox"
       },
       {
         "baseFilters": [],
         "datasource": {
           "type": "elasticsearch",
-          "uid": "cc171413-c307-499a-bb55-7037f8da7543"
+          "uid": "${DS_ESNET}"
         },
         "filters": [],
-        "hide": 0,
         "label": "filters",
         "name": "Filters",
-        "skipUrlSync": false,
         "type": "adhoc"
       }
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-30d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "utc",
-  "title": "Scitags Network Flows (v2)",
+  "title": "Scitags Network Flows (v3)",
   "uid": "a6d7dc1e-dc56-4f39-abe0-a9e7199021f9",
-  "version": 3,
-  "weekStart": ""
+  "version": 8,
+  "weekStart": "",
+  "id": null
 }
