@@ -21,7 +21,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "12.2.0"
+      "version": "12.2.2"
     },
     {
       "type": "panel",
@@ -84,7 +84,7 @@
         "type": "elasticsearch",
         "uid": "${DS_ESNET}"
       },
-      "description": "Average network throughput across all finished network flows (non-aggregated).",
+      "description": "Aggregated network throughput across all finished network flows (sum(total_bytes)/bin).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -241,7 +241,7 @@
               "type": "sum"
             }
           ],
-          "query": "meta.state.keyword:end AND meta.cric.src.name.keyword:${src_site} AND meta.cric.dst.name.keyword:${dst_site:lucene} AND meta.cric.src.net_site.keyword:${src_net_site:lucene} AND meta.cric.dst.net_site.keyword:${dst_net_site:lucene} AND meta.experiment_name.keyword:${vo:lucene} AND meta.activity_name.keyword:${activity:lucene} AND meta.cric.src.country.keyword: ${src_country:lucene} AND meta.cric.dst.country.keyword:${dst_country:lucene} AND meta.syslog.hostname.keyword:/.*${origin}/",
+          "query": "meta.state.keyword:end AND meta.cric.src.name.keyword:${src_site} AND meta.cric.dst.name.keyword:${dst_site:lucene} AND meta.cric.src.net_site.keyword:${src_net_site:lucene} AND meta.cric.dst.net_site.keyword:${dst_net_site:lucene} AND meta.experiment_name.keyword:${vo:lucene} AND meta.activity_name.keyword:${activity:lucene} AND meta.cric.src.country.keyword: ${src_country:lucene} AND meta.cric.dst.country.keyword:${dst_country:lucene} AND   meta.syslog.hostname.keyword:/.*${origin}/",
           "refId": "A",
           "timeField": "@timestamp"
         }
@@ -544,14 +544,14 @@
           "type": "elasticsearch",
           "uid": "${DS_ESNET}"
         },
-        "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.src.rc_tier_level\"}",
+        "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.src.tier\"}",
         "description": "",
         "includeAll": true,
         "label": "Source Tier",
         "multi": true,
         "name": "src_tier",
         "options": [],
-        "query": "{\"find\": \"terms\", \"field\":\"meta.cric.src.rc_tier_level\"}",
+        "query": "{\"find\": \"terms\", \"field\":\"meta.cric.src.tier\"}",
         "refresh": 1,
         "regex": "",
         "sort": 1,
@@ -564,13 +564,13 @@
           "type": "elasticsearch",
           "uid": "${DS_ESNET}"
         },
-        "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.rc_tier_level\"}",
+        "definition": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.tier\"}",
         "includeAll": true,
         "label": "Dest Tier",
         "multi": true,
         "name": "dst_tier",
         "options": [],
-        "query": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.rc_tier_level\"}",
+        "query": "{\"find\": \"terms\", \"field\":\"meta.cric.dst.tier\"}",
         "refresh": 1,
         "regex": "",
         "sort": 1,
@@ -671,8 +671,8 @@
           },
           {
             "selected": false,
-            "text": "application",
-            "value": "application"
+            "text": "application.keyword",
+            "value": "application.keyword"
           },
           {
             "selected": false,
@@ -701,6 +701,16 @@
           },
           {
             "selected": false,
+            "text": "meta.cric.src.tier",
+            "value": "meta.cric.src.tier"
+          },
+          {
+            "selected": false,
+            "text": "meta.cric.dst.tier",
+            "value": "meta.cric.dst.tier"
+          },
+          {
+            "selected": false,
             "text": "src_ip",
             "value": "src_ip"
           },
@@ -715,7 +725,7 @@
             "value": "syslog.hostname.keyword"
           }
         ],
-        "query": "experiment_name.keyword,activity_name.keyword,application,ip_version,cric.src.name.keyword,cric.dst.name.keyword,cric.src.country.keyword,cric.dst.country.keyword,src_ip,dst_ip,syslog.hostname.keyword",
+        "query": "experiment_name.keyword,activity_name.keyword,application.keyword,ip_version,cric.src.name.keyword,cric.dst.name.keyword,cric.src.country.keyword,cric.dst.country.keyword,meta.cric.src.tier,meta.cric.dst.tier,src_ip,dst_ip,syslog.hostname.keyword",
         "type": "custom"
       },
       {
@@ -755,9 +765,9 @@
   },
   "timepicker": {},
   "timezone": "utc",
-  "title": "Scitags Network Flows (v3)",
+  "title": "Scitags Network Flows (v2)",
   "uid": "a6d7dc1e-dc56-4f39-abe0-a9e7199021f9",
-  "version": 8,
+  "version": 11,
   "weekStart": "",
   "id": null
 }
