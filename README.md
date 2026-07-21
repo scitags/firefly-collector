@@ -156,41 +156,6 @@ Translates experiment and activity IDs to human-readable names.
 - `[meta][experiment]` - Human-readable experiment name (e.g., "ATLAS")
 - `[meta][activity]` - Human-readable activity name (e.g., "Real Data")
 
-## Global Collector Configuration
-
-The global collector configuration includes all available filters in the recommended processing order. This is used when you need full flow analysis with all enrichment data.
-
-```ruby
-# Input
-01-input.conf
-
-# Parsing
-02-parsing.conf
-
-# Calculations
-05-calc-duration.conf
-06-calc-throughput.conf
-
-# Post-processing (renames, direction normalization, pruning)
-63-post-processing.conf
-
-# Local traffic filtering (optional - skip if you want to keep all traffic)
-64-drop-local.conf
-
-# Site enrichment (requires cric.mmdb)
-70-cric-sites.conf
-
-# Experiment/activity enrichment (requires YAML maps)
-71-scitags.conf
-
-# Output (choose one: Opensearch, Kafka, or Forwarding)
-99-outputs.conf.example
-99-kafka.conf.example
-99-firefly-fwd.conf.example
-```
-
-**When to use:** Choose this configuration when you need complete flow data with site locations, experiment names, duration, throughput, and all enrichment for analysis, dashboards, and long-term storage.
-
 ## Metadata Generation Scripts
 
 ### CRIC Metadata Collector (`metadata/cric/cric_metadata_collector.py`)
