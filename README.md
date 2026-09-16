@@ -3,8 +3,11 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Pipeline Flow](#pipeline-flow)
-- [Components](#components)
+- [Goals](#goals)
+- [Quickstart](#quickstart)
+- [Component Overview](#component-overview)
+- [Hardware Requirements](#hardware-requirements)
+- [Logstash Components](#components)
   - [1. Input (`01-input.conf`)](#1-input-01-inputconf)
   - [2. Parsing (`02-parsing.conf`)](#2-parsing-02-parsingconf)
   - [3. Duration Calculation (`05-calc-duration.conf`)](#3-duration-calculation-05-calc-durationconf)
@@ -16,7 +19,7 @@
 - [Metadata Generation Scripts](#metadata-generation-scripts)
 - [Output Options](#output-options)
 - [Sample Deployment Configurations](#sample-deployment-configurations)
-- [Logstash Deployment](#docker-deployment)
+- [Logstash Deployment](#logstash-deployment)
 - [Dashboard](#dashboard)
 - [Field Reference](#field-reference)
 
@@ -24,13 +27,128 @@
 
 The Firefly Collector is a packet collection and analysis pipeline for any scientific data transfer system that supports fireflies (network telemetry). It ingests network flow metadata via UDP using the "firefly" protocol, enriches the data with site and experiment information, performs calculations, and stores the results for visualization and analysis.
 
-### Pipeline Flow
+## Goals
+
+The goal of the Firefly Collector is to run a SciTags collector, i.e. a service that plays the same role for
+SciTags fireflies that a NetFlow/sFlow collector plays for router-exported flow records. Instead of receiving
+flow records from network devices, it receives fireflies emitted by the data transfer applications and storage
+systems themselves, which means each flow already carries the science context (experiment, activity,
+application) that a NetFlow/sFlow collector can only guess at.
+
+In practice this means:
+
+- **Collect** - listen for firefly UDP datagrams (syslog-framed JSON) from transfer nodes, storage endpoints and site forwarders
+- **Enrich** - annotate each flow with site, network and geographic metadata (WLCG CRIC) and with experiment/activity names (SciTags registry)
+- **Compute** - derive per-flow duration, total bytes and average throughput
+- **Store and visualise** - keep the flow records in OpenSearch/Elasticsearch and expose them through dashboards, the same way a NetFlow collector feeds traffic reports
+- **Forward** - relay fireflies onward (UDP or Kafka) so a site can run its own collector and still feed regional or global R&E collectors
+
+## Quickstart
+
+The quickest way to get a collector running is to start Logstash in Docker with the pipeline from this
+repository. Clone the repository and pick an output:
+
+```bash
+git clone https://github.com/scitags/firefly-collector.git
+cd firefly-collector
+cp conf/logstash/99-kafka.conf.example conf/logstash/99-kafka.conf
+# edit conf/logstash/99-kafka.conf and set the Kafka hosts/credentials
+```
+
+Select logstash components you'd like to run and remove all others: 
+
+```bash
+# basic forwarder setup only needs 01-input.conf, 02-parsing.conf and 99-kafka.conf
+find conf/logstash/ -maxdepth 1 -type f \
+  ! -name "01-input.conf" \
+  ! -name "02-parsing.conf" \
+  ! -name "99-kafka.conf" -delete
+```
+
+Then start Logstash with `docker run`:
+
+```bash
+docker run \
+  --network=host \
+  --name firefly-stream \
+  -d \
+  -v ./conf/logstash/:/usr/share/logstash/pipeline/ \
+  -v ./conf/ruby/:/usr/lib/firefly/ruby/ \
+  -v ./conf/logstash_data/:/etc/stardust/pipeline/ \
+  -e XPACK_MONITORING_ENABLED=false \
+  docker.elastic.co/logstash/logstash:7.17.19
+```
+
+or, equivalently, with the bundled Compose file:
+
+```bash
+docker compose up -d
+docker compose logs -f logstash
+```
+
+The collector now listens for fireflies on UDP port 10514. To check the pipeline without an OpenSearch
+instance, drop the output config and use the debug output instead:
+
+```bash
+cp conf/logstash/98-stdout.conf.debug conf/logstash/98-stdout.conf
+```
+
+Sample fireflies for testing are in `test/`. Check [Hardware Requirements](#hardware-requirements) before
+sizing a production deployment, and [Logstash Deployment](#logstash-deployment) for the full set of deployment
+options.
+
+## Component Overview
 
 ```
-UDP (port 10514) → Logstash → [Parsing → Calculations → Enrichment → Output]
+UDP (port 10514) → Logstash → [Parsing → Calculations → Enrichment] → OpenSearch → Grafana
+                                                                   ↘ Kafka / UDP forward
 ```
 
-## Components
+A complete collector deployment is made up of three components:
+
+- **Logstash** - the collector itself. It receives fireflies on UDP port 10514, parses the syslog-wrapped JSON,
+  computes duration and throughput, enriches the flows with CRIC and SciTags metadata, and writes them to an
+  output (OpenSearch, Kafka or another collector). All pipeline configuration lives in `conf/logstash/`.
+- **OpenSearch** (or Elasticsearch) - the storage and search backend. Flow records are indexed under the
+  `stardust_firefly` alias with ILM/ISM handling index rollover and retention, which is what makes historical
+  queries and aggregations over flows possible. See [Opensearch Deployment](#opensearch-deployment-docker-compose).
+- **Grafana** - the visualisation layer. Grafana queries OpenSearch through its OpenSearch/Elasticsearch data
+  source and renders the traffic, throughput and site-to-site views. OpenSearch Dashboards can be used instead
+  (a sample dashboard is provided in `dashboards/`), but Grafana is the recommended front end for regional and
+  global collectors since it can combine firefly data with other network metrics.
+
+Only Logstash is mandatory: a pure forwarder or Kafka-producing collector needs neither OpenSearch nor Grafana.
+
+## Hardware Requirements
+
+Hardware requirements are driven almost entirely by the number of fireflies (flows) the collector is expected
+to receive. A normal, small-sized VM is enough for a regional collector: regional traffic should not exceed
+**5M flows/day**, which corresponds to roughly **10M UDP packets/day** (each flow produces a start and an end
+firefly).
+
+| Role | vCPU | RAM | Disk |
+|------|------|-----|------|
+| Forwarder only (parse + forward/Kafka) | 2 | 4 GB | minimal (logs only) |
+| Regional collector (~5M flows/day, Logstash only) | 4 | 8 GB | minimal (logs only) |
+| Full stack (Logstash + OpenSearch + Grafana) | 8 | 16-32 GB | sized for retention |
+
+Sizing notes:
+
+- **CPU** - the Logstash pipeline is the CPU-bound part (grok, Ruby filters, MMDB lookups). At 10M packets/day
+  (~120 packets/s average) the load is modest; size for the peak burst rate rather than the daily average.
+- **Memory** - Logstash itself is happy with a 2-4 GB heap. OpenSearch is the memory-hungry component; the
+  example Compose file sets a very large heap for a dedicated node, so reduce `OPENSEARCH_JAVA_OPTS` to
+  something like `-Xms8g -Xmx8g` (and never more than half of the VM's RAM) for a small deployment.
+- **Disk** - only needed when storing flows in OpenSearch. Budget on the order of a few hundred bytes per
+  indexed flow, so ~5M flows/day is a few GB/day including replicas; multiply by your retention period and
+  leave headroom.
+- **Network** - the UDP input is bursty. `queue_size => 50000` and `workers => 20` in `01-input.conf` absorb
+  bursts; on busy collectors also raise the kernel receive buffer (`net.core.rmem_max`) and watch for UDP
+  receive errors as the primary sign of an undersized collector.
+
+Scaling beyond a single VM is unlikely, but could be done by running IP-based load balancer with multiple endpoints.
+
+## Logstash Components
 
 ### 1. Input (`01-input.conf`)
 
