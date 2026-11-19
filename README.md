@@ -215,6 +215,7 @@ Normalizes and renames fields for consistent data model.
 - Syslog fields → `[meta][syslog]` namespace (timestamp, version, hostname, app_name)
 - Context fields → `[meta]` namespace (activity_id, application, experiment_id)
 - Firefly version → `[meta][firefly_version]`
+- dCache release, if the firefly carries `dcache-version` → `[meta][dcache_version]`
 - Usage/storage values → `[values]` namespace
 
 **Direction normalization:**
@@ -452,6 +453,7 @@ Supports:
 | `[meta][experiment_id]` | SciTags experiment ID |
 | `[meta][activity_id]` | SciTags activity ID |
 | `[meta][firefly_version]` | Firefly protocol version |
+| `[meta][dcache_version]` | dCache release that sent the firefly (only from releases that name the supplier of the data as src) |
 | `[start]` | Flow start timestamp |
 | `[end]` | Flow end timestamp |
 | `[duration]` | Flow duration (seconds) |
