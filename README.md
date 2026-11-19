@@ -218,9 +218,16 @@ Normalizes and renames fields for consistent data model.
 - dCache release, if the firefly carries `dcache-version` → `[meta][dcache_version]`
 - Usage/storage values → `[values]` namespace
 
-**Direction normalization:**
-- If `received > sent` and application is NOT http-put/http-get, swaps src/dst fields
-- This ensures `sent` is always the larger value for most transfers
+**Direction normalization:** the aim is that `src` is the supplier of the data and `dst` its receiver.
+- dCache fireflies that carry `dcache-version` already follow this, and count `usage` from the
+  supplier's side (`sent` is the data). They are left as they are.
+- Fireflies of earlier dCache releases always name the remote party as `src` and the dCache node as `dst`,
+  and count `usage` from the dCache node's side. The node supplied the data when `sent > received`, so
+  src/dst are swapped in that case.
+- For other senders, src/dst are swapped if `received > sent` and application is NOT http-put/http-get
+  (XRootD names the server as `src` unless it knows that the client supplies the data).
+- A `start` firefly carries no usage and is never swapped, so for earlier dCache releases the `start` and
+  `end` records of a transfer in which dCache supplied the data name the endpoints in opposite order.
 
 **Pruning:** Keeps only essential fields (meta, start, end, duration, throughput, total_bytes, message, @timestamp, values, storage)
 
